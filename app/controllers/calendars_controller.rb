@@ -5,7 +5,7 @@ class CalendarsController < ApplicationController
     getWeek
     @plan = Plan.new
   end
-  
+
   # 予定の保存
   def create
     Plan.create(plan_params)
@@ -24,7 +24,7 @@ class CalendarsController < ApplicationController
     # Dateオブジェクトは、日付を保持しています。下記のように`.today.day`とすると、今日の日付を取得できます。
     @todays_date = Date.today
     # 例)　今日が2月1日の場合・・・ Date.today.day => 1日
-
+    @wdays = Date.today.wday
     @week_days = []
 
     plans = Plan.where(date: @todays_date..@todays_date + 6)
@@ -34,7 +34,14 @@ class CalendarsController < ApplicationController
       plans.each do |plan|
         today_plans.push(plan.plan) if plan.date == @todays_date + x
       end
-      days = { :month => (@todays_date + x).month, :date => (@todays_date+x).day, :plans => today_plans}
+
+      @wdays = x
+      wday_num = @wdays # wdayメソッドを用いて取得した数値
+      if wday_num >= 7 #「wday_numが7以上の場合」という条件式
+        wday_num = wday_num -7
+      end
+
+      days = { :month => (@todays_date + x).month, :date => (@todays_date+x).day, :plans => today_plans, :wday => wdays[wday_num]}
       @week_days.push(days)
     end
 
